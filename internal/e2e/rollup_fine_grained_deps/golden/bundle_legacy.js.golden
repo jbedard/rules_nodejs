@@ -5,4 +5,4 @@ var bundle_legacy = (function (exports) {
     exports.__moduleExports = main$1;
     return exports;
 }({}));
-//# sourceMappingURL=bundle_legacy.es2015.js.map
+//# sourceMappingURL=bundle_legacy.js.map

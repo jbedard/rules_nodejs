@@ -15,6 +15,10 @@ describe('outputgroups', () => {
     checkExists('bundle.es2015.js');
     checkExists('bundle.es2015.js.map');
   });
+  it('should produce a es5 sourcemap', () => {
+    checkExists('bundle.js');
+    checkExists('bundle.js.map');
+  });
   it('should produce a es5_min sourcemap', () => {
     checkExists('bundle.min.js');
     checkExists('bundle.min.js.map');

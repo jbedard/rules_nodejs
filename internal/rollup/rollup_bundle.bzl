@@ -222,7 +222,12 @@ def _run_rollup(ctx, sources, config, output, map_output = None):
         arguments = [args],
     )
 
-def _run_tsc(ctx, input, output):
+def _run_tsc(ctx, input, input_map, output):
+    # Output to a temp file so we can add an extra step of processing sourcemaps
+    # See https://github.com/Microsoft/TypeScript/issues/13944
+    temp_js = ctx.actions.declare_file("temp__" + output.basename, sibling = output)
+    temp_map = ctx.actions.declare_file("temp__" + output.basename + ".map", sibling = output)
+
     args = ctx.actions.args()
 
     # No types needed since we are just downleveling.
@@ -234,16 +239,31 @@ def _run_tsc(ctx, input, output):
     args.add_all(["--target", "es5"])
     args.add_all(["--lib", "es2015,dom"])
     args.add("--allowJS")
+    args.add("--sourceMap")
     args.add(input.path)
-    args.add_all(["--outFile", output.path])
+    args.add_all(["--outFile", temp_js.path])
 
     ctx.actions.run(
         progress_message = "Downleveling JavaScript to ES5 %s [typescript]" % output.short_path,
         executable = ctx.executable._tsc,
         inputs = [input],
-        outputs = [output],
+        outputs = [temp_js, temp_map],
         arguments = [args],
     )
+
+    map_output = ctx.actions.declare_file(output.basename + ".map", sibling = output)
+
+    # output: temp_js after replacing the //#sourceMappingURL references with the output_map
+    # output_map: merged input_map (source => es6 bundle) + temp_map (es6 => es5)
+    ctx.actions.run(
+        progress_message = "Merging bundle and downleveled sourcemaps %s" % output.short_path,
+        executable = ctx.executable._merge_maps,
+        inputs = [temp_js, input_map, temp_map],
+        outputs = [output, map_output],
+        arguments = [temp_js.path, output.path, input_map.path, temp_map.path, map_output.path],
+    )
+
+    return map_output
 
 def _run_tsc_on_directory(ctx, input_dir, output_dir):
     config = ctx.actions.declare_file("_%s.code-split.tsconfig.json" % ctx.label.name)
@@ -506,9 +526,9 @@ def _rollup_bundle(ctx):
         es2015_map = run_rollup(ctx, _collect_es2015_sources(ctx), rollup_config, ctx.outputs.build_es2015)
         es2015_min_map = run_terser(ctx, ctx.outputs.build_es2015, ctx.outputs.build_es2015_min, config_name = ctx.label.name + "es2015_min", in_source_map = es2015_map)
         es2015_min_debug_map = run_terser(ctx, ctx.outputs.build_es2015, ctx.outputs.build_es2015_min_debug, debug = True, config_name = ctx.label.name + "es2015_min_debug", in_source_map = es2015_map)
-        _run_tsc(ctx, ctx.outputs.build_es2015, ctx.outputs.build_es5)
-        es5_min_map = run_terser(ctx, ctx.outputs.build_es5, ctx.outputs.build_es5_min)
-        es5_min_debug_map = run_terser(ctx, ctx.outputs.build_es5, ctx.outputs.build_es5_min_debug, debug = True)
+        es5_map = _run_tsc(ctx, ctx.outputs.build_es2015, es2015_map, ctx.outputs.build_es5)
+        es5_min_map = run_terser(ctx, ctx.outputs.build_es5, ctx.outputs.build_es5_min, in_source_map = es5_map)
+        es5_min_debug_map = run_terser(ctx, ctx.outputs.build_es5, ctx.outputs.build_es5_min_debug, debug = True, in_source_map = es5_map)
 
         cjs_rollup_config = write_rollup_config(ctx, filename = "_%s_cjs.rollup.conf.js", output_format = "cjs")
         cjs_map = run_rollup(ctx, _collect_es2015_sources(ctx), cjs_rollup_config, ctx.outputs.build_cjs)
@@ -516,8 +536,8 @@ def _rollup_bundle(ctx):
         umd_rollup_config = write_rollup_config(ctx, filename = "_%s_umd.rollup.conf.js", output_format = "umd")
         umd_map = run_rollup(ctx, _collect_es2015_sources(ctx), umd_rollup_config, ctx.outputs.build_umd)
         umd_min_map = run_terser(ctx, ctx.outputs.build_umd, ctx.outputs.build_umd_min, config_name = ctx.label.name + "umd_min", in_source_map = umd_map)
-        _run_tsc(ctx, ctx.outputs.build_umd, ctx.outputs.build_es5_umd)
-        es5_umd_min_map = run_terser(ctx, ctx.outputs.build_es5_umd, ctx.outputs.build_es5_umd_min, config_name = ctx.label.name + "es5umd_min")
+        es5_umd_map = _run_tsc(ctx, ctx.outputs.build_umd, umd_map, ctx.outputs.build_es5_umd)
+        es5_umd_min_map = run_terser(ctx, ctx.outputs.build_es5_umd, ctx.outputs.build_es5_umd_min, config_name = ctx.label.name + "es5umd_min", in_source_map = es5_umd_map)
 
         run_sourcemapexplorer(ctx, ctx.outputs.build_es5_min, es5_min_map, ctx.outputs.explore_html)
 
@@ -527,10 +547,10 @@ def _rollup_bundle(ctx):
             es2015 = depset([ctx.outputs.build_es2015, es2015_map]),
             es2015_min = depset([ctx.outputs.build_es2015_min, es2015_min_map]),
             es2015_min_debug = depset([ctx.outputs.build_es2015_min_debug, es2015_min_debug_map]),
-            es5 = depset([ctx.outputs.build_es5]),
+            es5 = depset([ctx.outputs.build_es5, es5_map]),
             es5_min = depset([ctx.outputs.build_es5_min, es5_min_map]),
             es5_min_debug = depset([ctx.outputs.build_es5_min_debug, es5_min_debug_map]),
-            es5_umd = depset([ctx.outputs.build_es5_umd]),
+            es5_umd = depset([ctx.outputs.build_es5_umd, es5_umd_map]),
             es5_umd_min = depset([ctx.outputs.build_es5_umd_min, es5_umd_min_map]),
             umd = depset([ctx.outputs.build_umd, umd_map]),
             umd_min = depset([ctx.outputs.build_umd_min, umd_min_map]),
@@ -683,6 +703,11 @@ ROLLUP_ATTRS = {
     "deps": attr.label_list(
         doc = """Other rules that produce JavaScript outputs, such as `ts_library`.""",
         aspects = ROLLUP_DEPS_ASPECTS,
+    ),
+    "_merge_maps": attr.label(
+        executable = True,
+        cfg = "host",
+        default = Label("@build_bazel_rules_nodejs//internal/rollup:merge-maps"),
     ),
     "_no_explore_html": attr.label(
         default = Label("@build_bazel_rules_nodejs//internal/rollup:no_explore.html"),

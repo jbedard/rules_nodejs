@@ -2,6 +2,7 @@
     "description": "runtime dependencies for rollup_bundle",
     "devDependencies": {
         "is-builtin-module": "2.0.0",
+        "merge-source-map": "^1.1.0",
         "minimist": "1.2.0",
         "rollup": "1.3.1",
         "rollup-plugin-amd": "^3.0.0",

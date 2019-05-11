@@ -54,6 +54,7 @@ function runTsc(inputDir, outputDir, projectFile) {
       'target': 'es5',
       'lib': ['es2015', 'dom'],
       'allowJs': true,
+      'sourceMap': true,
       'outDir': outputBasename,
     },
     'include': [`${inputBasename}/*`],

@@ -25,6 +25,7 @@ jasmine_node_test(
         "*_golden.js.map",
     ]) + [
         ":bundle",
+        ":bundle-outputgroups-es5",
         ":bundle.cjs.js",
         ":bundle.umd.js",
         ":bundle.es5umd.js",
@@ -75,6 +76,12 @@ filegroup(
 )
 
 filegroup(
+    name = "bundle-outputgroups-es5",
+    srcs = [":bundle"],
+    output_group = "es5",
+)
+
+filegroup(
     name = "bundle-outputgroups-es5_min",
     srcs = [":bundle"],
     output_group = "es5_min",
@@ -92,6 +99,7 @@ jasmine_node_test(
     data = [
         ":bundle-outputgroups-cjs",
         ":bundle-outputgroups-es2015",
+        ":bundle-outputgroups-es5",
         ":bundle-outputgroups-es5_min",
         ":bundle-outputgroups-es5_min_debug",
         ":bundle-outputgroups-es5_umd",

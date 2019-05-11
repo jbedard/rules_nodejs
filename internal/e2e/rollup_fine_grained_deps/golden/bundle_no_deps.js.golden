@@ -3,4 +3,4 @@ var bundle_no_deps = (function () {
     var noDeps = 'no-deps';
     return noDeps;
 }());
-//# sourceMappingURL=bundle_no_deps.es2015.js.map
+//# sourceMappingURL=bundle_no_deps.js.map
