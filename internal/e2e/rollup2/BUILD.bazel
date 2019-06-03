@@ -1,0 +1,35 @@
+load("//internal/rollup2:rollup_bundle.bzl", "consume_rollup", "rollup_bundle")
+load("//internal/rollup2:downlevel.bzl", "downlevel")
+# load("//internal/rollup2:terser.bzl", "terser")
+
+rollup_bundle(
+    name = "bundle",
+    srcs = [
+        "bar.js",
+        "foo.js",
+    ],
+    entry_point = ":foo.js",
+    globals = {"some_global_var": "runtime_name_of_global_var"},
+    license_banner = ":license.txt",
+    deps = [
+        "//internal/e2e/rollup2/fum:fumlib",
+        # TODO: npm - "@npm//hello",
+    ],
+)
+
+downlevel(
+    name = "downlevel",
+    bundle = ":bundle",
+)
+
+# TODO: not implemented yet
+# terser(
+#     name = "terser",
+#     bundle = ":bundle",
+# )
+
+consume_rollup(
+    name = "consume",
+    bundle = ":bundle",  # downlevel|terser|bundle
+    type = "es2015",  # es2015|amd|umd|cjs
+)
