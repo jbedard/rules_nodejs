@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//internal/terser:terser.bzl", "terser")
+
+terser(
+    name = "trans-maps",
+    srcs = [":bundle.cjs.js"],
+    in_source_maps = [":bundle.cjs.js.map"],
+)
+
+filegroup(
+    name = "testdata",
+    srcs = [
+        "bundle.cjs.min_golden.js.map",
+        "bundle.cjs.min_golden.js_",
+    ],
+)

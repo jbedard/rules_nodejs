@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../internal/e2e/terser/multiple/first.js"],"names":["THE_FIRST"],"mappings":"OAAO,MAAMA,UAAY","sourcesContent":["export const THE_FIRST = '1';"]}

@@ -1,0 +1,24 @@
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+
+jasmine_node_test(
+    name = "test",
+    srcs = ["terser.spec.js"],
+    configuration_env_vars = ["UPDATE_GOLDEN"],
+    data = [
+        "//internal/e2e/terser/basic",
+        "//internal/e2e/terser/basic:testdata",
+        "//internal/e2e/terser/dirtest",
+        "//internal/e2e/terser/dirtest:testdata",
+        "//internal/e2e/terser/multiple",
+        "//internal/e2e/terser/multiple:testdata",
+        "//internal/e2e/terser/trans-maps",
+        "//internal/e2e/terser/trans-maps:testdata",
+        "//internal/e2e/terser/trans-maps-dir",
+        "//internal/e2e/terser/trans-maps-dir:testdata",
+    ],
+    deps = [
+        "//internal/e2e:check_lib",
+        "@npm//jasmine",
+        "@npm//unidiff",
+    ],
+)

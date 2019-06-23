@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//internal/terser:terser.bzl", "terser")
+
+terser(
+    name = "dirtest",
+    srcs = [":testdir"],
+)
+
+filegroup(
+    name = "testdata",
+    srcs = [":testdir.min_golden"],
+)

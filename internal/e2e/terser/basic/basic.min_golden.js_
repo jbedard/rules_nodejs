@@ -1,0 +1,1 @@
+const foo=42;let bar=123;function veryLongName(o,r){return o*r}export const API=veryLongName(42*bar,bar);

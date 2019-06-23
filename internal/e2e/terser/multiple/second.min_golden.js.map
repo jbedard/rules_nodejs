@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../internal/e2e/terser/multiple/second.js"],"names":["from","THE_SECOND"],"mappings":"MAASA,KAAK,iBACP,MAAMC,WAAa","sourcesContent":["export * from './first';\nexport const THE_SECOND = '2';"]}

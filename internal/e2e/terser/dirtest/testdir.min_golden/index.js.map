@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../internal/e2e/terser/dirtest/testdir/index.js"],"names":["from","fum"],"mappings":"MAASA,KAAK,eACP,MAAMC,IAAM","sourcesContent":["export * from './fum';\nexport const fum = 'Wonderland';"]}

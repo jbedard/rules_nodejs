@@ -15,6 +15,7 @@ module.exports = {
         'karma',
         'labs',
         'rollup',
+        'terser',
         'typescript',
       ]
     ]

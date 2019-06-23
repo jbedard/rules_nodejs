@@ -1,0 +1,8 @@
+{
+    "description": "runtime dependencies for terser",
+    "devDependencies": {
+        "minimist": "^1.2.0",
+        "terser": "^4.0.0",
+        "tmp": "^0.1.0"
+    }
+}

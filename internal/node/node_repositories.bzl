@@ -643,6 +643,17 @@ def node_repositories(
 
     _maybe(
         yarn_install,
+        name = "build_bazel_rules_nodejs_terser_deps",
+        package_json = "@build_bazel_rules_nodejs//internal/terser:package.json",
+        yarn_lock = "@build_bazel_rules_nodejs//internal/terser:yarn.lock",
+        # Do not symlink node_modules as when used in downstream repos we should not create
+        # node_modules folders in the @build_bazel_rules_nodejs external repository. This is
+        # not supported by managed_directories.
+        symlink_node_modules = False,
+    )
+
+    _maybe(
+        yarn_install,
         name = "history-server_runtime_deps",
         package_json = "@build_bazel_rules_nodejs//internal/history-server:package.json",
         yarn_lock = "@build_bazel_rules_nodejs//internal/history-server:yarn.lock",

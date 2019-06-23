@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//internal/terser:terser.bzl", "terser")
+
+terser(
+    name = "basic",
+    srcs = ["basic.js"],
+)
+
+filegroup(
+    name = "testdata",
+    srcs = [
+        "basic.min_golden.js.map",
+        "basic.min_golden.js_",
+    ],
+)
