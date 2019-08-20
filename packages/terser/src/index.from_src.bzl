@@ -17,7 +17,7 @@
 
 load(
     ":index.bzl",
-    _terser_minified = "terser_minified",
+    _terser = "terser_minified",
 )
 
 def terser_minified(**kwargs):

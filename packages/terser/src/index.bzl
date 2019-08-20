@@ -1,9 +1,9 @@
 "User configuration to run the terser binary under bazel"
 
-load("@build_bazel_rules_nodejs//:providers.bzl", "JSModuleInfo", "collect_js_modules")
+load("@build_bazel_rules_nodejs//:providers.bzl", "JSModuleInfo", "JSNamedModuleInfo", "JSEcmaScriptModuleInfo")
 
 TERSER_ATTRS = {
-    "srcs": attr.label_list(
+    "src": attr.label(
         doc = "TODO",
         allow_files = True,
         mandatory = True,
@@ -51,14 +51,21 @@ def _dict_to_struct(d):
             d[key] = struct(**value)
     return struct(**d)
 
-def run_terser(ctx, srcs, output):
+def run_terser(ctx, srcs, maps):
     """TODO: doc"""
+
+    srcs_list = srcs.to_list()
+
+    if len(srcs_list) == 0:
+        return None
 
     # CLI arguments; see https://www.npmjs.com/package/terser#command-line-usage
     args = ctx.actions.args()
-    args.add_all([src.path for src in srcs])
+    args.add_all([src.path for src in srcs_list])
 
+    output = ctx.actions.declare_file(srcs_list[0].basename)
     outputs = [output]
+    map_outputs = []
     args.add_all(["--output", output])
 
     # TODO: also check the env.DEBUG variable
@@ -82,9 +89,9 @@ def run_terser(ctx, srcs, output):
         "mangle": not debug,
     }
 
-    if ctx.attr.sourcemap:
+    if maps:
         map_output = ctx.actions.declare_file(output.basename + ".map", sibling = output)
-        outputs.append(map_output)
+        map_outputs.append(map_output)
 
         # Source mapping options are comma-packed into one argv
         # see https://github.com/terser-js/terser#command-line-usage
@@ -102,21 +109,58 @@ def run_terser(ctx, srcs, output):
     args.add_all(["--config-file", opts.path])
 
     ctx.actions.run(
-        inputs = srcs + [opts],
+        inputs = srcs.to_list() + [opts],
         outputs = outputs,
         executable = ctx.executable.terser_bin,
         arguments = [args],
         progress_message = "Optimizing JavaScript %s [terser]" % (output.short_path),
     )
-    return outputs
+    return struct(
+        sources = outputs,
+        sourcemaps = map_outputs,
+    )
 
 def _terser(ctx):
-    modules = collect_js_modules(ctx)
-    outputs = run_terser(ctx, modules.sources, ctx.outputs.optimized)
+    src = ctx.attr.src
+    result = []
 
-    result = [DefaultInfo(files = depset(outputs))]
-    if modules.module_format:
-        result.append(JSModuleInfo(module_format = modules.module_format, sources = depset(outputs)))
+    # TODO: input sourcemaps for each provider type?
+
+    # DefaultInfo - sources+sourcemaps unioned into DefaultInfo
+    if DefaultInfo in src:
+        defaults = run_terser(ctx, src[DefaultInfo].files, ctx.attr.sourcemap)
+        result.append(DefaultInfo(
+            files = depset(defaults.sources + defaults.sourcemaps),
+        ))
+
+    # JSModuleInfo
+    if JSModuleInfo in src:
+        module = src[JSModuleInfo]
+        module_outputs = run_terser(ctx, module.sources, module.sourcemaps)
+        result.append(JSModuleInfo(
+            module_format = module.module_format,
+            sources = depset(module_outputs.sources),
+            sourcemaps = depset(module_outputs.sourcemaps),
+        ))
+
+    # JSNamedModuleInfo
+    if JSNamedModuleInfo in src:
+        module = src[JSNamedModuleInfo]
+        module_outputs = run_terser(ctx, module.sources, module.sourcemaps)
+        result.append(JSNamedModuleInfo(
+            sources = depset(module_outputs.sources),
+            sourcemaps = depset(module_outputs.sourcemaps),
+        ))
+
+    # JSEcmaScriptModuleInfo
+    if JSEcmaScriptModuleInfo in src:
+        module = src[JSEcmaScriptModuleInfo]
+        module_outputs = run_terser(ctx, module.sources, module.sourcemaps)
+        result.append(JSEcmaScriptModuleInfo(
+            sources = depset(module_outputs.sources),
+            sourcemaps = depset(module_outputs.sourcemaps),
+        ))
+
     return result
 
 terser_minified = rule(

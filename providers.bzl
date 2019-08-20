@@ -56,7 +56,7 @@ def collect_js_modules(ctx):
         elif format != src[JSModuleInfo].module_format:
             fail("a mix of module_format. TODO: better error message")
         result.extend(src[JSModuleInfo].sources.to_list())
-    return struct(
+    return JSModuleInfo(
         module_format = format,
         sources = result,
     )

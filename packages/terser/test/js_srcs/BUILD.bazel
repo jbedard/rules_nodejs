@@ -4,14 +4,25 @@ load("@npm_bazel_terser//:index.from_src.bzl", "terser_minified")
 # Case 1: optimize InputArtifacts
 terser_minified(
     name = "case1",
+    src = ":src1.js",
+    sourcemap = False,
+)
+
+# Case 2: optimize non-iterable depset (filegroup)
+filegroup(
+    name = "case2input",
     srcs = [
         "src1.js",
         "src1b.js",
     ],
+)
+terser_minified(
+    name = "case2",
+    src = ":case2input",
     sourcemap = False,
 )
 
-# Case 2: get the JS file from DefaultInfo of a dep
+# Case 3: get the JS file from DefaultInfo of a dep
 load(":produces_js_as_defaultinfo.bzl", "produces_js_as_defaultinfo")
 
 produces_js_as_defaultinfo(
@@ -20,8 +31,8 @@ produces_js_as_defaultinfo(
 )
 
 terser_minified(
-    name = "case2",
-    srcs = [":src2_in"],
+    name = "case3",
+    src = ":src2_in",
     sourcemap = False,
 )
 

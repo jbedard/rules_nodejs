@@ -3,9 +3,7 @@ load("@npm_bazel_terser//:index.from_src.bzl", "terser_minified")
 
 terser_minified(
     name = "case1",
-    srcs = [
-        "src1.js",
-    ],
+    src = ":src1.js",
 )
 
 jasmine_node_test(

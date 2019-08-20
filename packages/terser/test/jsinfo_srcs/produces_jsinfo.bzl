@@ -4,8 +4,10 @@ load("@build_bazel_rules_nodejs//:providers.bzl", "JSModuleInfo")
 
 def _produces_jsinfo(ctx):
     return [
+        DefaultInfo(files = depset(ctx.files.srcs)),
         JSModuleInfo(
             sources = depset(ctx.files.srcs),
+            sourcemaps = depset(),
             module_format = "umd",
         ),
     ]

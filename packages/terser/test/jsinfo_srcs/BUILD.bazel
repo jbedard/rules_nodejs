@@ -12,7 +12,7 @@ produces_jsinfo(
 
 terser_minified(
     name = "terser",
-    srcs = [":in"],
+    src = ":in",
     sourcemap = False,
 )
 
@@ -30,7 +30,7 @@ jasmine_node_test(
     tags = ["manual"],
     deps = [
         ":out",
-        ":terser.js",
+        ":terser",
     ],
 )
 
