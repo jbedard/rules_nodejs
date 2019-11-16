@@ -27,9 +27,11 @@ ts_library(
     srcs = [
         "decrement.spec.ts",
         "foobar.spec.ts",
+        "subdirindex.spec.ts",
     ],
     deps = [
         ":lib",
+        "//packages/karma/test/karma_typescript/subdirindex",
         "@npm//@types/jasmine",
     ],
 )
