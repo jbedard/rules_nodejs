@@ -10,9 +10,11 @@ load("@npm_bazel_typescript//:index.bzl", "ts_devserver", "ts_library")
 package(default_visibility = ["//visibility:public"])
 
 _ASSETS = [
-    ":bundle.min",
     "//styles:base.css",
     "//styles:test.css",
+]
+_PROD_SCRIPTS = [
+    ":bundle.min",
 ]
 
 ts_library(
@@ -22,7 +24,7 @@ ts_library(
 
 ts_devserver(
     name = "devserver",
-    static_files = [":inject_tags"] + _ASSETS,
+    static_files = [":inject_tags_dev"] + _ASSETS,
     # We'll collect all the devmode JS sources from these TypeScript libraries
     deps = [":app"],
 )
@@ -40,7 +42,7 @@ terser_minified(
 
 # Copy index.html to the output folder, adding <script> and <link> tags
 html_insert_assets(
-    name = "inject_tags",
+    name = "inject_tags_dev",
     outs = ["index.html"],
     args = [
         "--out",
@@ -55,9 +57,25 @@ html_insert_assets(
     data = [":index.tmpl.html"] + _ASSETS,
 )
 
+html_insert_assets(
+    name = "inject_tags_prod",
+    outs = ["_package/index.html"],
+    args = [
+        "--out",
+        "$(location _package/index.html)",
+        "--html",
+        "$(location :index.tmpl.html)",
+        "--roots",
+        "$@",
+    ] + [
+        "--assets",
+    ] + ["$(locations %s)" % a for a in _ASSETS + _PROD_SCRIPTS],
+    data = [":index.tmpl.html"] + _ASSETS + _PROD_SCRIPTS,
+)
+
 pkg_web(
     name = "package",
-    srcs = [":inject_tags"] + _ASSETS,
+    srcs = [":inject_tags_prod"] + _ASSETS + _PROD_SCRIPTS,
 )
 
 http_server(
