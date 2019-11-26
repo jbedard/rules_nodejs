@@ -17,7 +17,17 @@ describe('app', () => {
 
   it('should display: Hello, TypeScript', (done) => {
     const div = element(by.css('div.ts1'));
-    div.getText().then(t => expect(t).toEqual(`Hello, TypeScript`));
-    done();
+    div.getText().then(t => expect(t).toEqual(`Hello, TypeScript`)).then(done);
+  });
+
+  it('should use the specified index.html', (done) => {
+    browser.getTitle().then(t => expect(t).toEqual(`app example`)).then(done);
+  });
+
+  it('should insert the specified stylesheet', (done) => {
+    const link = element(by.css('link'));
+    link.getAttribute('href')
+        .then(href => expect(href.startsWith('/styles/')).toBe(true))
+        .then(done);
   });
 });
