@@ -52,7 +52,7 @@ html_insert_assets(
         "--roots",
         "$@",
     ] + [
-        "--assets",
+        "--assets", "_/ts_scripts.js"
     ] + ["$(locations %s)" % a for a in _ASSETS],
     data = [":index.tmpl.html"] + _ASSETS,
 )
