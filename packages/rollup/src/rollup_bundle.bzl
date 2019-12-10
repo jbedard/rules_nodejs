@@ -305,7 +305,7 @@ def _rollup_bundle(ctx):
         ctx,
         progress_message = "Bundling JavaScript %s [rollup]" % outputs[0].short_path,
         executable = "rollup_bin",
-        inputs = inputs,
+        inputs_depsets = [depset(inputs)],
         outputs = outputs,
         arguments = [args],
     )

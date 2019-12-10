@@ -38,7 +38,7 @@ do the same.
     },
 )
 
-def run_node(ctx, inputs, arguments, executable, **kwargs):
+def run_node(ctx, inputs_depsets, arguments, executable, **kwargs):
     """Helper to replace ctx.actions.run
     This calls node programs with a node_modules directory in place"""
     if (type(executable) != "string"):
@@ -48,15 +48,15 @@ def run_node(ctx, inputs, arguments, executable, **kwargs):
     exec_attr = getattr(ctx.attr, executable)
     exec_exec = getattr(ctx.executable, executable)
 
-    extra_inputs = []
+    inputs_files = []
     link_data = []
     if (NodeRuntimeDepsInfo in exec_attr):
-        extra_inputs = exec_attr[NodeRuntimeDepsInfo].deps.to_list()
+        inputs_depsets.append(exec_attr[NodeRuntimeDepsInfo].deps)
         link_data = exec_attr[NodeRuntimeDepsInfo].pkgs
 
     modules_manifest = write_node_modules_manifest(ctx, link_data)
     add_arg(arguments, "--bazel_node_modules_manifest=%s" % modules_manifest.path)
-    inputs.append(modules_manifest)
+    inputs_files.append(modules_manifest)
 
     # By using the run_node helper, you suggest that your program
     # doesn't implicitly use runfiles to require() things
@@ -64,7 +64,7 @@ def run_node(ctx, inputs, arguments, executable, **kwargs):
     add_arg(arguments, "--nobazel_patch_module_resolver")
 
     ctx.actions.run(
-        inputs = inputs + extra_inputs,
+        inputs = depset(inputs_files, transitive = inputs_depsets),
         arguments = arguments,
         executable = exec_exec,
         **kwargs

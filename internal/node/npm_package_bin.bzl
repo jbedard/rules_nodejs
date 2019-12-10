@@ -55,7 +55,7 @@ def _inputs(ctx):
     for d in ctx.attr.data:
         if NpmPackageInfo in d:
             inputs_depsets.append(d[NpmPackageInfo].sources)
-    return depset(ctx.files.data, transitive = inputs_depsets).to_list()
+    return depset(ctx.files.data, transitive = inputs_depsets)
 
 def _impl(ctx):
     if ctx.attr.output_dir and ctx.attr.outs:
@@ -79,7 +79,7 @@ def _impl(ctx):
     run_node(
         ctx,
         executable = "tool",
-        inputs = inputs,
+        inputs_depsets = [inputs],
         outputs = outputs,
         arguments = [args],
     )
