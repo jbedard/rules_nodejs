@@ -14,6 +14,6 @@
 
 "Public API for rollup rules"
 
-load(":rollup_bundle.bzl", _rollup_bundle = "rollup_bundle")
+load(":rollup_bundle.bzl", _rollup_bundle = "rollup_bundle_macro")
 
 rollup_bundle = _rollup_bundle

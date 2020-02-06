@@ -18,6 +18,7 @@
         "@bazel/buildozer": "^0.29.0",
         "@bazel/hide-bazel-files": "file:./packages/hide-bazel-files",
         "@bazel/ibazel": "^0.10.3",
+        "@bazel/worker": "^1.2.4",
         "@commitlint/cli": "^8.0.0",
         "@commitlint/config-conventional": "^8.0.0",
         "@types/hammerjs": "2.0.35",
