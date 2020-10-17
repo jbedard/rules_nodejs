@@ -1,7 +1,7 @@
 load("@npm//@bazel/protractor:index.bzl", "protractor_web_test_suite")
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
 
-ts_library(
+ts_project(
     name = "e2e",
     testonly = 1,
     srcs = glob(["src/*.ts"]),

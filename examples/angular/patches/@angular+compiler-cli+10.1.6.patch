@@ -1,0 +1,38 @@
+diff --git a/node_modules/@angular/compiler-cli/src/ngtsc/util/src/typescript.js b/node_modules/@angular/compiler-cli/src/ngtsc/util/src/typescript.js
+index 0950c79..e30e98b 100755
+--- a/node_modules/@angular/compiler-cli/src/ngtsc/util/src/typescript.js
++++ b/node_modules/@angular/compiler-cli/src/ngtsc/util/src/typescript.js
+@@ -98,7 +98,12 @@
+             topLevel.modifiers.some(function (modifier) { return modifier.kind === ts.SyntaxKind.ExportKeyword; });
+     }
+     exports.isExported = isExported;
++    // PATCHED:
++    //  https://github.com/angular/angular/issues/36290
++    //  https://github.com/angular/angular/pull/36291
+     function getRootDirs(host, options) {
++        var cwd = host.getCurrentDirectory();
++        var fs = file_system_1.getFileSystem();
+         var rootDirs = [];
+         if (options.rootDirs !== undefined) {
+             rootDirs.push.apply(rootDirs, tslib_1.__spread(options.rootDirs));
+@@ -107,14 +112,18 @@
+             rootDirs.push(options.rootDir);
+         }
+         else {
+-            rootDirs.push(host.getCurrentDirectory());
++            rootDirs.push(cwd);
+         }
+         // In Windows the above might not always return posix separated paths
+         // See:
+         // https://github.com/Microsoft/TypeScript/blob/3f7357d37f66c842d70d835bc925ec2a873ecfec/src/compiler/sys.ts#L650
+         // Also compiler options might be set via an API which doesn't normalize paths
+-        return rootDirs.map(function (rootDir) { return file_system_1.absoluteFrom(host.getCanonicalFileName(rootDir)); });
++        return rootDirs.map(function (rootDir) {
++            var rooted = fs.isRooted(rootDir) ? rootDir : fs.join(cwd, rootDir);
++            return file_system_1.resolve(rooted);
++        });
+     }
++    // END PATCHED
+     exports.getRootDirs = getRootDirs;
+     function nodeDebugInfo(node) {
+         var sf = getSourceFile(node);

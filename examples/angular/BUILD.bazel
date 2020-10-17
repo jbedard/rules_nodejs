@@ -4,7 +4,7 @@ package(default_visibility = ["//:__subpackages__"])
 
 exports_files(["favicon.ico"])
 
-# ts_library uses the `//:tsconfig.json` target
+# ts_project uses the `//:tsconfig.json` target
 # by default. This alias allows omitting explicit tsconfig
 # attribute.
 alias(

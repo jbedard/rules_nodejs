@@ -1,7 +1,7 @@
 load("@io_bazel_rules_sass//:defs.bzl", "multi_sass_binary")
 load("@npm//@bazel/karma:index.bzl", "karma_web_test_suite")
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
-load("//tools:angular_ts_library.bzl", "ng_ts_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+load("//tools:angular_ts_project.bzl", "ng_ts_project")
 
 package(default_visibility = ["//:__subpackages__"])
 
@@ -14,7 +14,7 @@ multi_sass_binary(
     ],
 )
 
-ng_ts_library(
+ng_ts_project(
     name = "hello-world",
     srcs = [
         "hello-world.component.ts",
@@ -35,7 +35,7 @@ ng_ts_library(
     ],
 )
 
-ts_library(
+ts_project(
     name = "test_lib",
     testonly = 1,
     srcs = glob(["*.spec.ts"]),

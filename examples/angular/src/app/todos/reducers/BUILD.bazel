@@ -1,10 +1,13 @@
-load("@npm//@bazel/typescript:index.bzl", "ts_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
 
 package(default_visibility = ["//:__subpackages__"])
 
-ts_library(
+ts_project(
     name = "reducers",
     srcs = glob(["*.ts"]),
+    declaration = True,
+    declaration_map = True,
+    tsconfig = "//src:tsconfig.json",
     deps = [
         "@npm//@ngrx/store",
     ],

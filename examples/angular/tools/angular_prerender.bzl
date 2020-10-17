@@ -1,7 +1,7 @@
 """Helper macros for rendering parts of an Angular application at build time"""
 
 load("@build_bazel_rules_nodejs//:index.bzl", _nodejs_binary = "nodejs_binary", _nodejs_test = "nodejs_test")
-load("@npm//@bazel/typescript:index.bzl", _ts_library = "ts_library")
+load("@npm//@bazel/typescript:index.bzl", _ts_project = "ts_project")
 
 def _get_output_path(route, root_at):
     return root_at + "/" + route + "/index.html"
@@ -22,7 +22,7 @@ def ng_prerender(name, index, prerender_roots = [], **kwargs):
     """
 
     renderer_lib = "%s_renderer_lib" % name
-    _ts_library(
+    _ts_project(
         name = renderer_lib,
         srcs = ["//src:prerender.ts"],
         deps = [
@@ -96,7 +96,7 @@ def ng_prerender_test(name, index, route, expected_elements = [], **kwargs):
         expected_elements: An optional array of expected elements that should appear in the index file
     """
 
-    _ts_library(
+    _ts_project(
         name = "%s_render_spec" % name,
         srcs = ["//src:prerender-spec.ts"],
         deps = [

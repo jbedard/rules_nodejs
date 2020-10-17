@@ -1,8 +1,8 @@
-load("//tools:angular_ts_library.bzl", "ng_ts_library")
+load("//tools:angular_ts_project.bzl", "ng_ts_project")
 
 package(default_visibility = ["//:__subpackages__"])
 
-ng_ts_library(
+ng_ts_project(
     name = "app",
     srcs = glob(
         include = ["*.ts"],
@@ -26,7 +26,7 @@ ng_ts_library(
     ],
 )
 
-ng_ts_library(
+ng_ts_project(
     name = "app_server",
     srcs = ["app.server.module.ts"],
     tsconfig = "//src:tsconfig-server",

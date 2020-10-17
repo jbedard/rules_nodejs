@@ -5,11 +5,11 @@ load("@io_bazel_rules_sass//:defs.bzl", "sass_binary")
 load("@npm//@babel/cli:index.bzl", "babel")
 load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
 load("@npm//@bazel/terser:index.bzl", "terser_minified")
-load("@npm//@bazel/typescript:index.bzl", "ts_config", "ts_devserver", "ts_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_config", "ts_devserver", "ts_project")
 load("@npm//history-server:index.bzl", "history_server")
 load("@npm//html-insert-assets:index.bzl", "html_insert_assets")
 load("//tools:angular_prerender.bzl", "ng_prerender", "ng_prerender_test")
-load("//tools:angular_ts_library.bzl", "ng_ts_library")
+load("//tools:angular_ts_project.bzl", "ng_ts_project")
 load("//tools:ngsw_config.bzl", "ngsw_config")
 
 package(default_visibility = ["//:__subpackages__"])
@@ -33,7 +33,7 @@ sass_binary(
     src = "styles.scss",
 )
 
-ts_library(
+ts_project(
     name = "initialize_testbed",
     testonly = 1,
     srcs = [
@@ -46,7 +46,7 @@ ts_library(
     ],
 )
 
-ng_ts_library(
+ng_ts_project(
     name = "src",
     srcs = [
         "main.dev.ts",
@@ -292,7 +292,7 @@ container_image(
     tags = ["local"],
 )
 
-ts_library(
+ts_project(
     name = "universal_server_lib",
     srcs = ["server.ts"],
     deps = [
