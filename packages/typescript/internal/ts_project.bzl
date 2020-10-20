@@ -54,6 +54,10 @@ def _join(*elements):
         return "/".join(segments)
     return "."
 
+def _is_ts_file(file):
+    ext = file.extension
+    return ext == "js" or ext == "mjs" or ext == "ts" or ext == "tsx" or ext == "json"
+
 def _ts_project_impl(ctx):
     arguments = ctx.actions.args()
 
@@ -61,12 +65,13 @@ def _ts_project_impl(ctx):
     has_source = None
     root_dir_pre = None
     for src in ctx.files.srcs:
-        if src.is_source:
-            has_source = src.path
-            root_dir_pre = src.root.path
-        else:
-            has_generated = src.path
-            root_dir_pre = ctx.bin_dir.path
+        if _is_ts_file(src):
+            if src.is_source:
+                has_source = src.path
+                root_dir_pre = src.root.path
+            else:
+                has_generated = src.path
+                root_dir_pre = ctx.bin_dir.path
 
     if has_source and has_generated:
         fail("srcs cannot be a mix of generated files and source files: %s, %s" % (has_generated, has_source))
