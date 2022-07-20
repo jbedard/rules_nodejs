@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "rootDirs": [
+            ".",
+            "../../bazel-out/k8-fastbuild/bin",
+            "../../bazel-out/darwin-fastbuild/bin",
+            "../../bazel-out/darwin_arm64-fastbuild/bin"
+        ]
+    }
+}

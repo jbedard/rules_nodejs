@@ -1,0 +1,31 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "js_library")
+load("//packages/typescript:index.bzl", "ts_project")
+
+
+ts_project(
+    name = "lib_ts",
+    declaration = True,
+    srcs = ["index.ts", "lib_types.d.ts"],
+)
+
+js_library(
+    name = "lib",
+    deps = [":lib_ts"],
+)
+
+js_library(
+    name = "lib_named",
+    package_name = "@myorg/dts_lib",
+    deps = [":lib_ts"],
+    visibility = ["//examples:__pkg__"],
+)
+
+ts_project(
+    name = "importer_ts",
+    declaration = True,
+    srcs = ["importer.ts"],
+    deps = [
+        ":lib",
+        ":lib_named"
+    ],
+)
