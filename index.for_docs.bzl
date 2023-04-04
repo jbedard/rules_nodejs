@@ -31,6 +31,16 @@ load("//internal/node:npm_package_bin.bzl", _npm_bin = "npm_package_bin")
 load("//internal/npm_install:npm_install.bzl", _npm_install = "npm_install", _yarn_install = "yarn_install")
 load("//internal/pkg_npm:pkg_npm.bzl", _pkg_npm = "pkg_npm")
 load("//internal/pkg_web:pkg_web.bzl", _pkg_web = "pkg_web")
+load(
+    "//:providers.bzl",
+    _DeclarationInfo = "DeclarationInfo",
+    _DirectoryFilePathInfo = "DirectoryFilePathInfo",
+    _JSModuleInfo = "JSModuleInfo",
+    _LinkablePackageInfo = "LinkablePackageInfo",
+    _declaration_info = "declaration_info",
+    _directory_file_path = "directory_file_path",
+    _js_module_info = "js_module_info",
+)
 
 copy_to_bin = _copy_to_bin
 params_file = _params_file
@@ -42,3 +52,11 @@ yarn_install = _yarn_install
 npm_package_bin = _npm_bin
 pkg_web = _pkg_web
 js_library = _js_library
+
+DeclarationInfo = _DeclarationInfo
+declaration_info = _declaration_info
+directory_file_path = _directory_file_path
+JSModuleInfo = _JSModuleInfo
+js_module_info = _js_module_info
+LinkablePackageInfo = _LinkablePackageInfo
+DirectoryFilePathInfo = _DirectoryFilePathInfo
